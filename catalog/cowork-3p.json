@@ -7,9 +7,8 @@
         "transport": "http",
         "url": "${OPENSYNAPSE_MCP_URL}",
         "oauth": {
-          "mode": "byo",
           "clientId": "${OPENSYNAPSE_MCP_OAUTH_CLIENT_ID}",
-          "authorizationServer": "${OPENSYNAPSE_MCP_OAUTH_ISSUER}",
+          "authorizationServer": ["${OPENSYNAPSE_MCP_OAUTH_ISSUER}"],
           "scope": "${OPENSYNAPSE_MCP_OAUTH_SCOPES}",
           "callbackHost": "127.0.0.1",
           "callbackPort": "${OPENSYNAPSE_MCP_OAUTH_CALLBACK_PORT}"
@@ -37,6 +36,16 @@
     ],
     "enabledPlugins": {
       "opensynapse-sample@opensynapse-sample-registry": true
-    }
+    },
+    "allowedPluginMarketplaces": [
+      {
+        "source": "github",
+        "repo": "Lucky9-Labs/opensynapse-sample-registry",
+        "ref": "${EXTENSION_REGISTRY_REF}",
+        "expectedName": "opensynapse-sample-registry",
+        "credentialKind": "anonymous",
+        "installationPreference": "required"
+      }
+    ]
   }
 }

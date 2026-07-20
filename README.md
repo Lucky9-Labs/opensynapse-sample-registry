@@ -33,4 +33,6 @@ claude plugin validate .
 
 Consumers should add the marketplace through managed settings and use the same
 immutable revision in both `extraKnownMarketplaces` and
-`strictKnownMarketplaces`.
+`strictKnownMarketplaces`. Cowork uses the same revision through
+`allowedPluginMarketplaces` with anonymous, required installation; the Claude
+Code tab uses the former settings.

@@ -7,6 +7,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,10 +24,14 @@ SECRET_PATTERNS = {
     "AWS access key": re.compile(r"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b"),
     "AWS account ID": re.compile(r"(?<!\d)\d{12}(?!\d)"),
     "private key": re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
+    "AWS ARN": re.compile(r"\barn:aws(?:-[a-z]+)?:"),
+    "GitHub token": re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})\b"),
     "assigned credential": re.compile(
         r"(?i)\b(?:api[_-]?key|client[_-]?secret|password|token)\b\s*[:=]\s*[\"']?[A-Za-z0-9_./+=-]{16,}"
     ),
 }
+URL = re.compile(r"https://[A-Za-z0-9.-]+(?:/[^\s<>\])}`\"']*)?")
+ALLOWED_PUBLIC_HOSTS = {"github.com", "code.claude.com", "json.schemastore.org"}
 
 
 def fail(message: str) -> None:
@@ -91,6 +96,7 @@ def validate_catalog() -> None:
         "extraKnownMarketplaces",
         "strictKnownMarketplaces",
         "enabledPlugins",
+        "allowedPluginMarketplaces",
     }
     if not isinstance(settings, dict) or set(settings) != required:
         fail("catalog managedSettings keys do not match the v1 contract")
@@ -102,6 +108,23 @@ def validate_catalog() -> None:
         fail("managed MCP must use HTTP and default every tool to ask")
     if server.get("url") != "${OPENSYNAPSE_MCP_URL}":
         fail("managed MCP URL must remain deployment-neutral")
+    oauth = server.get("oauth")
+    if not isinstance(oauth, dict) or oauth.get("authorizationServer") != [
+        "${OPENSYNAPSE_MCP_OAUTH_ISSUER}"
+    ]:
+        fail("managed MCP OAuth issuer must use the Desktop 3P string-array schema")
+    marketplaces = settings["allowedPluginMarketplaces"]
+    if marketplaces != [
+        {
+            "source": "github",
+            "repo": "Lucky9-Labs/opensynapse-sample-registry",
+            "ref": "${EXTENSION_REGISTRY_REF}",
+            "expectedName": "opensynapse-sample-registry",
+            "credentialKind": "anonymous",
+            "installationPreference": "required",
+        }
+    ]:
+        fail("Cowork marketplace must be anonymous, required, and revision-pinned")
     discovered = set(PLACEHOLDER.findall(json.dumps(catalog, sort_keys=True)))
     if discovered != ALLOWED_PLACEHOLDERS:
         fail(f"catalog placeholders differ from contract: {sorted(discovered)}")
@@ -118,6 +141,10 @@ def scan_secrets() -> None:
         for label, pattern in SECRET_PATTERNS.items():
             if pattern.search(content):
                 fail(f"possible {label} in {path.relative_to(ROOT)}")
+        for raw_url in URL.findall(content):
+            host = urlparse(raw_url).hostname
+            if host not in ALLOWED_PUBLIC_HOSTS:
+                fail(f"environment-specific URL in {path.relative_to(ROOT)}: {host}")
 
 
 def main() -> int:
