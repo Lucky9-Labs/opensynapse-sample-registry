@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenSynapse Health Check"
+  short_description: "Verify managed OpenSynapse inference and trace evidence."
+  default_prompt: "Check the managed OpenSynapse connection by running a harmless prompt and confirming its trace status."

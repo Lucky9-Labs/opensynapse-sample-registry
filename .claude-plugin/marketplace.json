@@ -1,0 +1,17 @@
+{
+  "name": "opensynapse-sample-registry",
+  "owner": {
+    "name": "Lucky9 Labs"
+  },
+  "description": "Public sample Claude extensions for OpenSynapse deployments.",
+  "plugins": [
+    {
+      "name": "opensynapse-sample",
+      "displayName": "OpenSynapse Sample",
+      "source": "./plugins/opensynapse-sample",
+      "description": "Skills for exercising a managed OpenSynapse inference and evidence connection.",
+      "category": "development",
+      "tags": ["opensynapse", "mcp", "observability"]
+    }
+  ]
+}
