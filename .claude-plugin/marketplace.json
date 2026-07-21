@@ -9,9 +9,9 @@
       "name": "opensynapse-sample",
       "displayName": "OpenSynapse Sample",
       "source": "./plugins/opensynapse-sample",
-      "description": "Skills for exercising a managed OpenSynapse inference and evidence connection.",
+      "description": "Skills for checking a managed OpenSynapse Claude deployment.",
       "category": "development",
-      "tags": ["opensynapse", "mcp", "observability"]
+      "tags": ["opensynapse", "bootstrap", "observability"]
     }
   ]
 }

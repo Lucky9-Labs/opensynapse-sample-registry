@@ -11,14 +11,7 @@ from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ALLOWED_PLACEHOLDERS = {
-    "EXTENSION_REGISTRY_REF",
-    "OPENSYNAPSE_MCP_OAUTH_CALLBACK_PORT",
-    "OPENSYNAPSE_MCP_OAUTH_CLIENT_ID",
-    "OPENSYNAPSE_MCP_OAUTH_ISSUER",
-    "OPENSYNAPSE_MCP_OAUTH_SCOPES",
-    "OPENSYNAPSE_MCP_URL",
-}
+ALLOWED_PLACEHOLDERS = {"EXTENSION_REGISTRY_REF"}
 PLACEHOLDER = re.compile(r"\$\{([A-Z0-9_]+)\}")
 SECRET_PATTERNS = {
     "AWS access key": re.compile(r"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b"),
@@ -101,18 +94,8 @@ def validate_catalog() -> None:
     if not isinstance(settings, dict) or set(settings) != required:
         fail("catalog managedSettings keys do not match the v1 contract")
     servers = settings["managedMcpServers"]
-    if not isinstance(servers, list) or len(servers) != 1:
-        fail("catalog must declare exactly one managed MCP server")
-    server = servers[0]
-    if server.get("transport") != "http" or server.get("toolPolicy") != {"*": "ask"}:
-        fail("managed MCP must use HTTP and default every tool to ask")
-    if server.get("url") != "${OPENSYNAPSE_MCP_URL}":
-        fail("managed MCP URL must remain deployment-neutral")
-    oauth = server.get("oauth")
-    if not isinstance(oauth, dict) or oauth.get("authorizationServer") != [
-        "${OPENSYNAPSE_MCP_OAUTH_ISSUER}"
-    ]:
-        fail("managed MCP OAuth issuer must use the Desktop 3P string-array schema")
+    if servers != []:
+        fail("public catalog managedMcpServers must be empty; deployments supply approved servers")
     marketplaces = settings["allowedPluginMarketplaces"]
     if marketplaces != [
         {

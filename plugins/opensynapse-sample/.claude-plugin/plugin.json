@@ -1,11 +1,12 @@
 {
   "name": "opensynapse-sample",
-  "description": "Exercise a managed OpenSynapse inference and trace-evidence connection.",
+  "version": "1.0.0",
+  "description": "Check a managed OpenSynapse Claude deployment.",
   "author": {
     "name": "Lucky9 Labs"
   },
   "homepage": "https://github.com/Lucky9-Labs/opensynapse-sample-registry",
   "repository": "https://github.com/Lucky9-Labs/opensynapse-sample-registry",
   "license": "MIT",
-  "keywords": ["opensynapse", "mcp", "health-check"]
+  "keywords": ["opensynapse", "bootstrap", "health-check"]
 }
